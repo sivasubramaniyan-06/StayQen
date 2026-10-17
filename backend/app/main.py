@@ -116,6 +116,14 @@ def resolve_conflict(conflict_id: str, resolution: ConflictResolution):
 def get_graph():
     return graph_service.get_graph_visualization()
 
+@app.get("/api/contracts")
+def list_contracts():
+    return graph_service.get_contracts_catalog()
+
+@app.get("/api/modules")
+def list_modules():
+    return graph_service.get_all_modules()
+
 @app.post("/api/demo/seed")
 def reset_and_seed_demo():
     h_id = seed_baseline_data()

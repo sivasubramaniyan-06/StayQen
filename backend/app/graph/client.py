@@ -297,16 +297,21 @@ class FalkorGraphService:
         }
         self.fallback_nodes[c_id] = {"label": "Conflict", "props": props}
         
-        # Link CONTRADICTS edge in graph
+        # Link CONTRADICTS edge in graph (prevent duplicates)
         source_id = conflict_data["new_evidence"].get("source_id")
         target_id = conflict_data["existing_evidence"].get("source_id")
         if source_id and target_id:
-            self.fallback_edges.append({
-                "source": source_id,
-                "target": target_id,
-                "type": "CONTRADICTS",
-                "label": "CONTRADICTS"
-            })
+            edge_exists = any(
+                e["source"] == source_id and e["target"] == target_id and e["type"] == "CONTRADICTS"
+                for e in self.fallback_edges
+            )
+            if not edge_exists:
+                self.fallback_edges.append({
+                    "source": source_id,
+                    "target": target_id,
+                    "type": "CONTRADICTS",
+                    "label": "CONTRADICTS"
+                })
             if self.connected and self.graph:
                 try:
                     self.graph.query(
@@ -316,6 +321,99 @@ class FalkorGraphService:
                     )
                 except Exception as e:
                     logger.error(f"FalkorDB CONTRADICTS edge error: {e}")
+
+    def get_all_modules(self) -> List[Dict[str, Any]]:
+        """Return all tracked modules, their affected handoffs, contracts, and dependencies."""
+        modules = []
+        conflicts = self.get_all_conflicts()
+        active_conflict_modules = set()
+        for c in conflicts:
+            if c.get("status") == "open":
+                for m in c.get("affected_modules", []):
+                    active_conflict_modules.add(m)
+
+        for nid, node in self.fallback_nodes.items():
+            if node["label"] == "Module":
+                m_name = node["props"].get("name", nid)
+                
+                # Find connected handoffs
+                connected_handoff_ids = [
+                    e["source"] for e in self.fallback_edges
+                    if e["target"] == nid and e["type"] == "AFFECTS" and self.fallback_nodes.get(e["source"], {}).get("label") == "Handoff"
+                ]
+                related_handoffs = [
+                    self.fallback_nodes[h_id]["props"].get("title", h_id)
+                    for h_id in connected_handoff_ids if h_id in self.fallback_nodes
+                ]
+
+                # Find connected contracts
+                connected_contract_ids = [
+                    e["source"] for e in self.fallback_edges
+                    if e["target"] == nid and e["type"] == "AFFECTS" and self.fallback_nodes.get(e["source"], {}).get("label") == "APIContract"
+                ]
+                related_contracts = [
+                    f"{self.fallback_nodes[c_id]['props'].get('method', 'POST')} {self.fallback_nodes[c_id]['props'].get('endpoint', c_id)}"
+                    for c_id in connected_contract_ids if c_id in self.fallback_nodes
+                ]
+
+                has_conflict = m_name in active_conflict_modules
+
+                modules.append({
+                    "id": nid,
+                    "name": m_name,
+                    "status": "conflict" if has_conflict else "aligned",
+                    "related_handoffs": related_handoffs,
+                    "related_contracts": related_contracts,
+                    "dependencies": ["fastapi", "pydantic"] if "auth" in m_name or "gateway" in m_name else ["next", "react-flow"]
+                })
+        return modules
+
+    def get_contracts_catalog(self) -> List[Dict[str, Any]]:
+        """Return rich contracts list with alignment status and affected modules."""
+        contracts = []
+        conflicts = self.get_all_conflicts()
+        open_conflict_endpoints = set()
+        for c in conflicts:
+            if c.get("status") == "open":
+                title = c.get("title", "")
+                for part in title.split():
+                    if part.startswith("/api/"):
+                        open_conflict_endpoints.add(part)
+
+        for nid, node in self.fallback_nodes.items():
+            if node["label"] == "APIContract":
+                p = node["props"]
+                endpoint = p.get("endpoint", "")
+                method = p.get("method", "POST")
+                is_conflicted = endpoint in open_conflict_endpoints
+                
+                # Find affected modules
+                mods = [
+                    self.fallback_nodes[e["target"]]["props"]["name"]
+                    for e in self.fallback_edges
+                    if e["source"] == nid and e["type"] == "AFFECTS" and self.fallback_nodes.get(e["target"], {}).get("label") == "Module"
+                ]
+
+                # Find source handoff
+                h_title = "Unknown"
+                if p.get("handoff_id") and p.get("handoff_id") in self.fallback_nodes:
+                    h_title = self.fallback_nodes[p["handoff_id"]]["props"].get("title", "Unknown")
+
+                s = p.get("response_schema", {})
+                schema = json.loads(s) if isinstance(s, str) else s
+
+                contracts.append({
+                    "id": p["id"],
+                    "endpoint": endpoint,
+                    "method": method,
+                    "description": p.get("description", ""),
+                    "response_schema": schema,
+                    "auth_required": p.get("auth_required", True),
+                    "status": "conflicted" if is_conflicted else "aligned",
+                    "affected_modules": mods,
+                    "source_handoff_title": h_title
+                })
+        return contracts
 
     def get_all_conflicts(self) -> List[Dict[str, Any]]:
         conflicts = []

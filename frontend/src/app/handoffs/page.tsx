@@ -121,11 +121,9 @@ export default function HandoffPage() {
     setSubmissionResult(null);
 
     try {
-      // Parse modules and dependencies
       const affected_modules = affectedModulesStr.split(",").map((s) => s.trim()).filter(Boolean);
       const dependencies = dependenciesStr.split(",").map((s) => s.trim()).filter(Boolean);
 
-      // Parse contracts
       const formattedContracts = apiContracts.map((c) => {
         let response_schema = {};
         try {
@@ -166,15 +164,15 @@ export default function HandoffPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto w-full space-y-6">
+    <div className="p-6 md:p-8 max-w-4xl mx-auto w-full space-y-6 bg-[#000000]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#23252E]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#27272F]">
         <div>
           <div className="flex items-center gap-2">
-            <GitPullRequestDraft className="w-5 h-5 text-[#DCD8D3]" />
+            <GitPullRequestDraft className="w-5 h-5 text-purple-400" />
             <h1 className="text-xl font-bold text-white">Record AI Work Handoff</h1>
           </div>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[#A1A1AA] mt-1">
             Capture completed AI coding sessions into STAYQEN’s graph memory to detect conflicting decisions.
           </p>
         </div>
@@ -184,14 +182,14 @@ export default function HandoffPage() {
           <button
             type="button"
             onClick={loadConflictTemplate}
-            className="px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/50 border border-red-800/50 text-red-300 text-xs font-mono transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/50 border border-red-800/60 text-red-300 text-xs font-mono transition-colors"
           >
             Load Conflict Case (token vs access_token)
           </button>
           <button
             type="button"
             onClick={loadConsistentTemplate}
-            className="px-3 py-1.5 rounded-lg bg-[#1D1F27] hover:bg-[#252833] border border-[#2D303D] text-gray-300 text-xs font-mono transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-[#09090B] hover:bg-[#15151B] border border-[#27272F] text-[#A1A1AA] hover:text-white text-xs font-mono transition-colors"
           >
             Load Clean Case
           </button>
@@ -200,7 +198,7 @@ export default function HandoffPage() {
 
       {/* Submission Feedback Banner */}
       {submissionResult && (
-        <div className={`p-5 rounded-xl border shadow-lg animate-fade-in ${
+        <div className={`p-5 rounded-xl border shadow-lg ${
           submissionResult.conflicts_detected > 0 
             ? "bg-red-950/30 border-red-800 text-red-200" 
             : "bg-emerald-950/30 border-emerald-800 text-emerald-200"
@@ -231,7 +229,7 @@ export default function HandoffPage() {
                 </button>
                 <button
                   onClick={() => router.push("/graph")}
-                  className="px-3.5 py-1.5 rounded-lg bg-[#1F2129] hover:bg-[#2B2D38] text-gray-200 text-xs font-medium font-mono"
+                  className="px-3.5 py-1.5 rounded-lg bg-[#15151B] hover:bg-[#202028] text-white text-xs font-medium font-mono border border-[#27272F]"
                 >
                   View in Graph
                 </button>
@@ -250,15 +248,15 @@ export default function HandoffPage() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Metadata Card */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] space-y-4">
-          <h2 className="text-sm font-semibold text-gray-200 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#B5AFA7]" />
+        <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] space-y-4">
+          <h2 className="text-xs font-mono uppercase tracking-wider text-[#A1A1AA] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
             Session Overview
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono text-gray-400 mb-1">
+              <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
                 Handoff Title *
               </label>
               <input
@@ -267,19 +265,19 @@ export default function HandoffPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Refactor User Login Flow"
-                className="w-full px-3.5 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-[#7E7972]"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white placeholder-[#71717A] focus:outline-none focus:border-[#71717A]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-mono text-gray-400 mb-1">
+                <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
                   Source AI Tool *
                 </label>
                 <select
                   value={sourceTool}
                   onChange={(e) => setSourceTool(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-sm text-gray-100 focus:outline-none focus:border-[#7E7972]"
+                  className="w-full px-3 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white focus:outline-none focus:border-[#71717A]"
                 >
                   <option value="Antigravity">Antigravity</option>
                   <option value="ChatGPT-4o">ChatGPT-4o</option>
@@ -291,7 +289,7 @@ export default function HandoffPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-gray-400 mb-1">
+                <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
                   Author / Engineer
                 </label>
                 <input
@@ -299,14 +297,14 @@ export default function HandoffPage() {
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full px-3 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-sm text-gray-100 focus:outline-none focus:border-[#7E7972]"
+                  className="w-full px-3 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white focus:outline-none focus:border-[#71717A]"
                 />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-mono text-gray-400 mb-1">
+            <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
               Completed Work Summary *
             </label>
             <textarea
@@ -315,13 +313,13 @@ export default function HandoffPage() {
               value={completedWork}
               onChange={(e) => setCompletedWork(e.target.value)}
               placeholder="Describe the precise changes, modules implemented, and behaviors modified..."
-              className="w-full px-3.5 py-2.5 rounded-lg bg-[#0E0F13] border border-[#262832] text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:border-[#7E7972]"
+              className="w-full px-3.5 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white placeholder-[#71717A] focus:outline-none focus:border-[#71717A]"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono text-gray-400 mb-1">
+              <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
                 Affected Modules (comma-separated)
               </label>
               <input
@@ -329,12 +327,12 @@ export default function HandoffPage() {
                 value={affectedModulesStr}
                 onChange={(e) => setAffectedModulesStr(e.target.value)}
                 placeholder="auth_service, frontend_web, api_gateway"
-                className="w-full px-3.5 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-sm text-gray-100 focus:outline-none focus:border-[#7E7972]"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white focus:outline-none focus:border-[#71717A]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-gray-400 mb-1">
+              <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
                 Dependencies (comma-separated)
               </label>
               <input
@@ -342,23 +340,23 @@ export default function HandoffPage() {
                 value={dependenciesStr}
                 onChange={(e) => setDependenciesStr(e.target.value)}
                 placeholder="fastapi, pydantic, redis"
-                className="w-full px-3.5 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-sm text-gray-100 focus:outline-none focus:border-[#7E7972]"
+                className="w-full px-3.5 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white focus:outline-none focus:border-[#71717A]"
               />
             </div>
           </div>
         </div>
 
         {/* API Contracts Section */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] space-y-4">
+        <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-[#A1A1AA] flex items-center gap-2">
               <FileCode2 className="w-4 h-4 text-cyan-400" />
-              API Contracts Defined or Changed
+              API Contracts Defined or Modified
             </h2>
             <button
               type="button"
               onClick={addContract}
-              className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#1D1F27] hover:bg-[#272A35] border border-[#2E313E] text-xs font-mono text-gray-300"
+              className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#15151B] hover:bg-[#1C1C24] border border-[#27272F] text-xs font-mono text-[#F5F5F5]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Contract</span>
@@ -366,13 +364,13 @@ export default function HandoffPage() {
           </div>
 
           {apiContracts.map((contract, idx) => (
-            <div key={idx} className="p-4 rounded-lg bg-[#0E0F13] border border-[#262833] space-y-3">
+            <div key={idx} className="p-4 rounded-lg bg-[#000000] border border-[#27272F] space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono text-cyan-400">Contract #{idx + 1}</span>
                 <button
                   type="button"
                   onClick={() => removeContract(idx)}
-                  className="text-gray-500 hover:text-red-400 p-1"
+                  className="text-[#71717A] hover:text-red-400 p-1"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -380,7 +378,7 @@ export default function HandoffPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="md:col-span-2">
-                  <label className="block text-[11px] font-mono text-gray-400 mb-1">Endpoint</label>
+                  <label className="block text-[11px] font-mono text-[#A1A1AA] mb-1">Endpoint</label>
                   <input
                     type="text"
                     value={contract.endpoint}
@@ -390,12 +388,12 @@ export default function HandoffPage() {
                       setApiContracts(updated);
                     }}
                     placeholder="/api/auth/login"
-                    className="w-full px-3 py-1.5 rounded bg-[#14151B] border border-[#2A2C38] text-xs text-gray-100 font-mono"
+                    className="w-full px-3 py-1.5 rounded bg-[#09090B] border border-[#27272F] text-xs text-white font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono text-gray-400 mb-1">HTTP Method</label>
+                  <label className="block text-[11px] font-mono text-[#A1A1AA] mb-1">HTTP Method</label>
                   <select
                     value={contract.method}
                     onChange={(e) => {
@@ -403,7 +401,7 @@ export default function HandoffPage() {
                       updated[idx].method = e.target.value;
                       setApiContracts(updated);
                     }}
-                    className="w-full px-3 py-1.5 rounded bg-[#14151B] border border-[#2A2C38] text-xs text-gray-100 font-mono"
+                    className="w-full px-3 py-1.5 rounded bg-[#09090B] border border-[#27272F] text-xs text-white font-mono"
                   >
                     <option value="POST">POST</option>
                     <option value="GET">GET</option>
@@ -414,7 +412,7 @@ export default function HandoffPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-gray-400 mb-1">
+                <label className="block text-[11px] font-mono text-[#A1A1AA] mb-1">
                   Response Schema (JSON)
                 </label>
                 <textarea
@@ -425,7 +423,7 @@ export default function HandoffPage() {
                     updated[idx].response_schema_str = e.target.value;
                     setApiContracts(updated);
                   }}
-                  className="w-full px-3 py-2 rounded bg-[#0A0B0E] border border-[#232530] text-xs text-cyan-200 font-mono focus:outline-none"
+                  className="w-full px-3 py-2 rounded bg-[#09090B] border border-[#27272F] text-xs text-cyan-300 font-mono focus:outline-none"
                 />
               </div>
             </div>
@@ -433,16 +431,16 @@ export default function HandoffPage() {
         </div>
 
         {/* Technical Decisions Section */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] space-y-4">
+        <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-[#A1A1AA] flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-amber-400" />
-              Technical Decisions Made
+              Technical Decisions Recorded
             </h2>
             <button
               type="button"
               onClick={addDecision}
-              className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#1D1F27] hover:bg-[#272A35] border border-[#2E313E] text-xs font-mono text-gray-300"
+              className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#15151B] hover:bg-[#1C1C24] border border-[#27272F] text-xs font-mono text-[#F5F5F5]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Decision</span>
@@ -450,13 +448,13 @@ export default function HandoffPage() {
           </div>
 
           {technicalDecisions.map((dec, idx) => (
-            <div key={idx} className="p-4 rounded-lg bg-[#0E0F13] border border-[#262833] space-y-3">
+            <div key={idx} className="p-4 rounded-lg bg-[#000000] border border-[#27272F] space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono text-amber-400">Decision #{idx + 1}</span>
                 <button
                   type="button"
                   onClick={() => removeDecision(idx)}
-                  className="text-gray-500 hover:text-red-400 p-1"
+                  className="text-[#71717A] hover:text-red-400 p-1"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -472,7 +470,7 @@ export default function HandoffPage() {
                     setTechnicalDecisions(updated);
                   }}
                   placeholder="Decision Title (e.g. Use RSA256 for token verification)"
-                  className="w-full px-3 py-1.5 rounded bg-[#14151B] border border-[#2A2C38] text-xs text-gray-100 mb-2"
+                  className="w-full px-3 py-1.5 rounded bg-[#09090B] border border-[#27272F] text-xs text-white mb-2"
                 />
                 <textarea
                   rows={2}
@@ -483,7 +481,7 @@ export default function HandoffPage() {
                     setTechnicalDecisions(updated);
                   }}
                   placeholder="Rationale and architectural implications..."
-                  className="w-full px-3 py-1.5 rounded bg-[#14151B] border border-[#2A2C38] text-xs text-gray-300"
+                  className="w-full px-3 py-1.5 rounded bg-[#09090B] border border-[#27272F] text-xs text-[#A1A1AA]"
                 />
               </div>
             </div>
@@ -491,25 +489,25 @@ export default function HandoffPage() {
         </div>
 
         {/* Unfinished Work & Potential Blockers */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] space-y-4">
-          <h2 className="text-sm font-semibold text-gray-200">
+        <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] space-y-4">
+          <h2 className="text-xs font-mono uppercase tracking-wider text-[#A1A1AA]">
             Unfinished Work & Blockers
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono text-gray-400 mb-1">
-                Unfinished Work / Next Steps
+              <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
+                Unfinished Tasks / Next Steps
               </label>
               <textarea
                 rows={2}
                 value={unfinishedWork}
                 onChange={(e) => setUnfinishedWork(e.target.value)}
                 placeholder="What remains to be completed?"
-                className="w-full px-3 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-xs text-gray-100"
+                className="w-full px-3 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white"
               />
             </div>
             <div>
-              <label className="block text-xs font-mono text-gray-400 mb-1">
+              <label className="block text-xs font-mono text-[#A1A1AA] mb-1">
                 Potential Blockers
               </label>
               <textarea
@@ -517,7 +515,7 @@ export default function HandoffPage() {
                 value={potentialBlockers}
                 onChange={(e) => setPotentialBlockers(e.target.value)}
                 placeholder="Any risks or external blockers?"
-                className="w-full px-3 py-2 rounded-lg bg-[#0E0F13] border border-[#262832] text-xs text-gray-100"
+                className="w-full px-3 py-2 rounded-lg bg-[#000000] border border-[#27272F] text-xs text-white"
               />
             </div>
           </div>
@@ -528,7 +526,7 @@ export default function HandoffPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#E3DFDA] hover:bg-white text-black font-semibold text-xs shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#F5F5F5] hover:bg-white text-black font-semibold text-xs shadow-md transition-all hover:scale-[1.01] disabled:opacity-50"
           >
             <Sparkles className="w-4 h-4 text-black" />
             <span>{isSubmitting ? "Linking to Knowledge Graph..." : "Submit to STAYQEN Graph"}</span>

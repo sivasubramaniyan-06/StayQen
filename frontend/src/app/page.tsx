@@ -5,281 +5,307 @@ import Link from "next/link";
 import Image from "next/image";
 import { 
   GitPullRequestDraft, 
+  Network, 
   AlertTriangle, 
   CheckCircle2, 
   FileCode2, 
   Layers, 
-  Network, 
-  Sparkles, 
   ArrowRight,
-  Clock,
-  Cpu,
-  RefreshCw
+  Sparkles,
+  ShieldAlert,
+  Database,
+  Terminal,
+  Cpu
 } from "lucide-react";
 import { DashboardStats, api } from "@/lib/api";
-import ConflictCard from "@/components/ConflictCard";
 
-export default function DashboardPage() {
+export default function LandingPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      const data = await api.getDashboardStats();
-      setStats(data);
-      setError(null);
-    } catch (err: any) {
-      console.error(err);
-      setError("Unable to connect to STAYQEN backend API. Ensure FastAPI server is running on port 8000.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchStats();
-    const handleRefresh = () => fetchStats();
-    window.addEventListener("stayqen:refresh", handleRefresh);
-    return () => window.removeEventListener("stayqen:refresh", handleRefresh);
+    api.getDashboardStats().then(setStats).catch(() => {});
   }, []);
 
-  const getToolBadge = (tool: string) => {
-    switch (tool?.toLowerCase()) {
-      case "chatgpt-4o":
-      case "chatgpt":
-        return "bg-emerald-950/60 text-emerald-300 border-emerald-800/60";
-      case "gemini":
-        return "bg-blue-950/60 text-blue-300 border-blue-800/60";
-      case "antigravity":
-        return "bg-purple-950/60 text-purple-300 border-purple-800/60";
-      case "claude":
-        return "bg-amber-950/60 text-amber-300 border-amber-800/60";
-      default:
-        return "bg-[#1E2027] text-gray-300 border-[#2D303A]";
-    }
-  };
-
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8">
-      {/* Top Hero Banner with Official STAYQEN Branding */}
-      <div className="relative rounded-2xl bg-gradient-to-r from-[#15161C] via-[#181A22] to-[#121318] border border-[#272935] p-6 sm:p-8 shadow-xl overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-2/5 opacity-25 pointer-events-none hidden md:block">
-          <Image
-            src="/stayqen-logo.png"
-            alt="STAYQEN Watermark"
-            fill
-            className="object-contain object-right drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
-          />
-        </div>
+    <div className="min-h-screen bg-[#000000] text-[#F5F5F5] flex flex-col justify-between selection:bg-[#27272F] selection:text-white">
+      {/* Top Navigation */}
+      <header className="border-b border-[#27272F] bg-[#000000]/80 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Logo on Pure Black - No Box */}
+          <Link href="/" className="flex items-center gap-2">
+            <div className="relative w-36 h-9">
+              <Image
+                src="/stayqen-logo.png"
+                alt="STAYQEN Logo"
+                fill
+                priority
+                sizes="180px"
+                className="object-contain object-left"
+              />
+            </div>
+          </Link>
 
-        <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#20232E] border border-[#2F3240] text-xs font-mono text-[#DCD8D3]">
+          {/* Nav Links */}
+          <nav className="hidden md:flex items-center gap-8 text-xs font-mono text-[#A1A1AA]">
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
+            <a href="#preview" className="hover:text-white transition-colors">Live Preview</a>
+          </nav>
+
+          {/* Auth / App CTAs */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="text-xs font-mono text-[#A1A1AA] hover:text-white px-3 py-1.5 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/dashboard"
+              className="px-4 py-1.5 rounded-lg bg-[#F5F5F5] hover:bg-white text-black font-semibold text-xs transition-all hover:scale-[1.02]"
+            >
+              Launch App
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="py-20 md:py-28 px-6 max-w-5xl mx-auto text-center space-y-8">
+          {/* Tag */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111116] border border-[#27272F] text-xs font-mono text-[#A1A1AA]">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Shared Project Memory & Conflict Coordination Layer</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Cross-AI Engineering Alignment
+          {/* Prominent Transparent Logo on Pure Black */}
+          <div className="relative w-full max-w-md h-24 sm:h-28 mx-auto flex items-center justify-center">
+            <Image
+              src="/stayqen-logo.png"
+              alt="STAYQEN Logo"
+              fill
+              priority
+              sizes="440px"
+              className="object-contain drop-shadow-[0_4px_24px_rgba(255,255,255,0.06)]"
+            />
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white max-w-3xl mx-auto leading-tight">
+            Different AI Tools. <br />
+            <span className="text-[#A1A1AA]">One Connected Intelligence.</span>
           </h1>
 
-          <p className="text-sm text-gray-400 leading-relaxed">
-            Record technical decisions, API schemas, and module contracts generated by ChatGPT, Gemini, Antigravity, and Claude. Catch breaking contract conflicts before code is merged.
+          {/* Subtext */}
+          <p className="text-sm sm:text-base text-[#A1A1AA] max-w-2xl mx-auto leading-relaxed">
+            STAYQEN connects technical decisions, API contracts, modules, and work handoffs produced by ChatGPT, Gemini, Antigravity, and Claude into an interconnected FalkorDB graph memory.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-3">
+          {/* CTAs */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/handoffs"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E3DFDA] hover:bg-white text-black text-xs font-semibold shadow transition-all hover:scale-[1.02]"
+              href="/login"
+              className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#F5F5F5] hover:bg-white text-black font-semibold text-sm transition-all shadow-lg hover:scale-[1.02]"
             >
-              <GitPullRequestDraft className="w-4 h-4 text-black" />
-              <span>Submit AI Handoff</span>
+              Get Started
             </Link>
-
             <Link
-              href="/graph"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1D1F27] hover:bg-[#252833] border border-[#2D303D] text-gray-200 text-xs font-medium transition-all"
+              href="/dashboard"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#111116] hover:bg-[#15151B] border border-[#27272F] text-white text-sm font-medium transition-colors"
             >
-              <Network className="w-4 h-4 text-[#B5AFA7]" />
-              <span>Explore Knowledge Graph</span>
+              <span>Explore the Platform</span>
+              <ArrowRight className="w-4 h-4 text-[#A1A1AA]" />
             </Link>
+          </div>
+        </section>
 
-            <button
-              onClick={fetchStats}
-              className="p-2 rounded-lg bg-[#181920] hover:bg-[#22242D] border border-[#2A2C38] text-gray-400 hover:text-white transition-colors"
-              title="Refresh Data"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {error && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-800/60 text-red-200 text-xs font-mono flex items-center gap-3">
-          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1 */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-400">
-            <span className="text-xs font-mono uppercase tracking-wider">AI Handoffs</span>
-            <GitPullRequestDraft className="w-4 h-4 text-purple-400" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-white">
-            {stats ? stats.total_handoffs : "..."}
-          </div>
-          <div className="text-[11px] text-gray-500 font-mono">
-            Recorded across {stats?.tools_used.length || 1} AI assistants
-          </div>
-        </div>
-
-        {/* Metric 2 */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-400">
-            <span className="text-xs font-mono uppercase tracking-wider">API Contracts</span>
-            <FileCode2 className="w-4 h-4 text-cyan-400" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-white">
-            {stats ? stats.total_contracts : "..."}
-          </div>
-          <div className="text-[11px] text-gray-500 font-mono">
-            Tracked in FalkorDB graph
-          </div>
-        </div>
-
-        {/* Metric 3 */}
-        <div className="p-5 rounded-xl bg-[#14151B] border border-[#23252E] shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-400">
-            <span className="text-xs font-mono uppercase tracking-wider">Affected Modules</span>
-            <Layers className="w-4 h-4 text-blue-400" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-white">
-            {stats ? stats.affected_modules_count : "..."}
-          </div>
-          <div className="text-[11px] text-gray-500 font-mono">
-            Protected components
-          </div>
-        </div>
-
-        {/* Metric 4 */}
-        <div className={`p-5 rounded-xl border shadow-sm space-y-2 transition-all ${
-          stats && stats.open_conflicts > 0
-            ? "bg-red-950/30 border-red-800/60 shadow-red-950/20"
-            : "bg-[#14151B] border-[#23252E]"
-        }`}>
-          <div className="flex items-center justify-between text-gray-400">
-            <span className="text-xs font-mono uppercase tracking-wider">Open Conflicts</span>
-            <AlertTriangle className={`w-4 h-4 ${stats && stats.open_conflicts > 0 ? "text-red-400" : "text-emerald-400"}`} />
-          </div>
-          <div className={`text-2xl sm:text-3xl font-bold font-mono ${stats && stats.open_conflicts > 0 ? "text-red-400" : "text-emerald-400"}`}>
-            {stats ? stats.open_conflicts : "..."}
-          </div>
-          <div className="text-[11px] text-gray-500 font-mono">
-            {stats && stats.open_conflicts > 0 ? "Requires developer reconciliation" : "All contracts aligned"}
-          </div>
-        </div>
-      </div>
-
-      {/* Active Conflict Spotlight (if conflicts present) */}
-      {stats && stats.active_conflicts.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-              <h2 className="text-base font-semibold text-white">
-                Detected Conflicts Awaiting Alignment ({stats.active_conflicts.length})
-              </h2>
+        {/* Live Product Preview */}
+        <section id="preview" className="px-6 max-w-6xl mx-auto py-12">
+          <div className="rounded-2xl border border-[#27272F] bg-[#09090B] p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#27272F] pb-4">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#A1A1AA]">
+                  Live System Intelligence
+                </span>
+                <h3 className="text-lg font-bold text-white">
+                  Cross-Assistant Coordination Engine
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  FalkorDB Memory Active
+                </span>
+              </div>
             </div>
+
+            {/* Metrics Snapshot */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-[#111116] border border-[#27272F] space-y-1">
+                <span className="text-[10px] font-mono text-[#A1A1AA] uppercase">Recorded Handoffs</span>
+                <div className="text-2xl font-bold font-mono text-white">
+                  {stats ? stats.total_handoffs : "2"}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-[#111116] border border-[#27272F] space-y-1">
+                <span className="text-[10px] font-mono text-[#A1A1AA] uppercase">API Contracts</span>
+                <div className="text-2xl font-bold font-mono text-cyan-400">
+                  {stats ? stats.total_contracts : "2"}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-[#111116] border border-[#27272F] space-y-1">
+                <span className="text-[10px] font-mono text-[#A1A1AA] uppercase">Tracked Modules</span>
+                <div className="text-2xl font-bold font-mono text-purple-400">
+                  {stats ? stats.affected_modules_count : "4"}
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-[#111116] border border-red-900/40 space-y-1">
+                <span className="text-[10px] font-mono text-red-400 uppercase">Open Conflicts</span>
+                <div className="text-2xl font-bold font-mono text-red-400">
+                  {stats ? stats.open_conflicts : "1"}
+                </div>
+              </div>
+            </div>
+
+            {/* Deterministic Conflict Callout */}
+            <div className="p-4 rounded-xl bg-[#15151B] border border-[#27272F] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-red-950/60 border border-red-800/50 mt-0.5">
+                  <ShieldAlert className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <div className="text-xs font-mono text-red-400 uppercase font-semibold">
+                    Live Conflict Detection
+                  </div>
+                  <div className="text-sm font-semibold text-white mt-0.5">
+                    POST /api/auth/login Response Key Mismatch
+                  </div>
+                  <p className="text-xs text-[#A1A1AA] mt-1 max-w-xl">
+                    ChatGPT defined OAuth2 token response as <code className="text-[#F5F5F5] font-mono">access_token</code>. Antigravity refactored payload to <code className="text-red-400 font-mono">token</code>. STAYQEN caught the breaking contract before merge.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/conflicts"
+                className="px-3.5 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900/60 border border-red-800/60 text-red-300 text-xs font-mono whitespace-nowrap"
+              >
+                Inspect Evidence →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Cards Section */}
+        <section id="features" className="py-16 px-6 max-w-6xl mx-auto space-y-10">
+          <div className="text-center space-y-2">
+            <span className="text-xs font-mono text-[#A1A1AA] uppercase tracking-wider">
+              Core Architecture
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              Built for Modern AI-Assisted Engineering
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Feature 1 */}
+            <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] hover:border-[#3F3F46] transition-colors space-y-3">
+              <div className="w-9 h-9 rounded-lg bg-[#15151B] border border-[#27272F] flex items-center justify-center text-purple-400">
+                <GitPullRequestDraft className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">
+                Shared AI Project Memory
+              </h3>
+              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                Structured capture of completed work, unfinished tasks, technical decisions, and blockers from any AI coding tool.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] hover:border-[#3F3F46] transition-colors space-y-3">
+              <div className="w-9 h-9 rounded-lg bg-[#15151B] border border-[#27272F] flex items-center justify-center text-cyan-400">
+                <Network className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">
+                Knowledge Graph Relationships
+              </h3>
+              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                FalkorDB graph engine mapping relationships between projects, team members, handoffs, API contracts, and modules.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] hover:border-[#3F3F46] transition-colors space-y-3">
+              <div className="w-9 h-9 rounded-lg bg-[#15151B] border border-[#27272F] flex items-center justify-center text-red-400">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">
+                Cross-AI Conflict Detection
+              </h3>
+              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                Continuous comparison of incoming handoffs against existing memory to detect breaking schema changes and contradictory decisions.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="p-5 rounded-xl bg-[#09090B] border border-[#27272F] hover:border-[#3F3F46] transition-colors space-y-3">
+              <div className="w-9 h-9 rounded-lg bg-[#15151B] border border-[#27272F] flex items-center justify-center text-emerald-400">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">
+                Evidence-Based Resolution
+              </h3>
+              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                Side-by-side evidence inspection tracing each side to its original tool and author, with 1-click reconciliation.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-20 px-6 max-w-4xl mx-auto text-center space-y-6 border-t border-[#27272F]">
+          <h2 className="text-2xl sm:text-4xl font-bold text-white">
+            Align Your Multi-AI Engineering Team
+          </h2>
+          <p className="text-sm text-[#A1A1AA] max-w-xl mx-auto">
+            Stop losing context between ChatGPT, Gemini, Antigravity, and Claude. Keep decisions, contracts, and modules coordinated in a single source of truth.
+          </p>
+          <div className="pt-2">
             <Link
-              href="/conflicts"
-              className="text-xs font-mono text-red-400 hover:text-red-300 flex items-center gap-1"
+              href="/dashboard"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#F5F5F5] hover:bg-white text-black font-semibold text-sm transition-all hover:scale-[1.02]"
             >
-              <span>View Conflict Center</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Enter STAYQEN Platform</span>
+              <ArrowRight className="w-4 h-4 text-black" />
             </Link>
           </div>
+        </section>
+      </main>
 
-          <div className="space-y-4">
-            {stats.active_conflicts.map((conf) => (
-              <ConflictCard key={conf.id} conflict={conf} onResolved={fetchStats} />
-            ))}
+      {/* Minimalist Footer */}
+      <footer className="border-t border-[#27272F] bg-[#000000] py-8 px-6 text-xs text-[#71717A] font-mono">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="relative w-24 h-6">
+              <Image
+                src="/stayqen-logo.png"
+                alt="STAYQEN"
+                fill
+                sizes="100px"
+                className="object-contain object-left"
+              />
+            </div>
+            <span>© 2026 STAYQEN. Shared Project Memory.</span>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/graph" className="hover:text-white transition-colors">Knowledge Graph</Link>
+            <Link href="/conflicts" className="hover:text-white transition-colors">Conflict Explorer</Link>
           </div>
         </div>
-      )}
-
-      {/* Recent Handoffs Table */}
-      <div className="rounded-xl bg-[#14151B] border border-[#23252E] overflow-hidden">
-        <div className="p-5 border-b border-[#23252E] flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-semibold text-white">
-              Recent AI Work Handoffs
-            </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Live chronological memory stream of AI assistant contributions
-            </p>
-          </div>
-          <Link
-            href="/handoffs"
-            className="text-xs font-mono text-[#DCD8D3] hover:underline flex items-center gap-1"
-          >
-            <span>+ New Handoff</span>
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#101115] text-gray-400 font-mono uppercase text-[10px] tracking-wider border-b border-[#20222A]">
-              <tr>
-                <th className="py-3 px-4">Title & Completed Work</th>
-                <th className="py-3 px-4">AI Tool</th>
-                <th className="py-3 px-4">Author</th>
-                <th className="py-3 px-4">Contracts / Decisions</th>
-                <th className="py-3 px-4">Modules Affected</th>
-                <th className="py-3 px-4">Recorded</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#1F2128]">
-              {stats?.recent_handoffs.map((h) => (
-                <tr key={h.id} className="hover:bg-[#181921] transition-colors">
-                  <td className="py-3.5 px-4 max-w-xs">
-                    <div className="font-medium text-gray-200 truncate">{h.title}</div>
-                    <div className="text-[11px] text-gray-400 truncate mt-0.5">{h.completed_work}</div>
-                  </td>
-                  <td className="py-3.5 px-4 whitespace-nowrap">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${getToolBadge(h.source_tool)}`}>
-                      {h.source_tool}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-gray-300 font-mono whitespace-nowrap">
-                    {h.author_name}
-                  </td>
-                  <td className="py-3.5 px-4 font-mono text-gray-400 whitespace-nowrap">
-                    {h.api_contracts.length} contract{h.api_contracts.length === 1 ? "" : "s"}, {h.technical_decisions.length} decision{h.technical_decisions.length === 1 ? "" : "s"}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex flex-wrap gap-1 max-w-[180px]">
-                      {h.affected_modules.map((m) => (
-                        <span key={m} className="px-1.5 py-0.5 rounded bg-[#1B1D25] border border-[#282B34] text-[10px] font-mono text-gray-400">
-                          {m}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-gray-500 font-mono text-[11px] whitespace-nowrap">
-                    {new Date(h.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </footer>
     </div>
   );
 }

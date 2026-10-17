@@ -25,28 +25,28 @@ import {
 } from "lucide-react";
 import { GraphData, GraphNode, api } from "@/lib/api";
 
-// Custom Node Renderer with Titanium Styling
+// Custom Node Renderer with Black & Charcoal Architecture Styling
 function CustomGraphNode({ data, selected }: NodeProps) {
   const nodeType = data.type as string;
 
   const getBadgeStyle = () => {
     switch (nodeType) {
       case "Project":
-        return { bg: "bg-blue-950/60", border: "border-blue-600/60", text: "text-blue-300", icon: Database };
+        return { bg: "bg-[#09090B]", border: "border-blue-500/60", text: "text-blue-400", icon: Database };
       case "TeamMember":
-        return { bg: "bg-emerald-950/60", border: "border-emerald-600/60", text: "text-emerald-300", icon: User };
+        return { bg: "bg-[#09090B]", border: "border-emerald-500/60", text: "text-emerald-400", icon: User };
       case "Handoff":
-        return { bg: "bg-purple-950/60", border: "border-purple-600/60", text: "text-purple-300", icon: GitCommit };
+        return { bg: "bg-[#09090B]", border: "border-purple-500/60", text: "text-purple-400", icon: GitCommit };
       case "Decision":
-        return { bg: "bg-amber-950/60", border: "border-amber-600/60", text: "text-amber-300", icon: CheckCircle2 };
+        return { bg: "bg-[#09090B]", border: "border-amber-500/60", text: "text-amber-400", icon: CheckCircle2 };
       case "APIContract":
-        return { bg: "bg-cyan-950/60", border: "border-cyan-600/60", text: "text-cyan-300", icon: FileCode2 };
+        return { bg: "bg-[#09090B]", border: "border-cyan-500/60", text: "text-cyan-400", icon: FileCode2 };
       case "Module":
-        return { bg: "bg-stone-900", border: "border-stone-700", text: "text-stone-300", icon: Layers };
+        return { bg: "bg-[#09090B]", border: "border-stone-600", text: "text-stone-300", icon: Layers };
       case "Conflict":
-        return { bg: "bg-red-950/80", border: "border-red-600", text: "text-red-300", icon: AlertTriangle };
+        return { bg: "bg-red-950/60", border: "border-red-500", text: "text-red-400", icon: AlertTriangle };
       default:
-        return { bg: "bg-[#1A1C22]", border: "border-[#2D303B]", text: "text-gray-300", icon: Info };
+        return { bg: "bg-[#09090B]", border: "border-[#27272F]", text: "text-[#A1A1AA]", icon: Info };
     }
   };
 
@@ -55,13 +55,13 @@ function CustomGraphNode({ data, selected }: NodeProps) {
 
   return (
     <div
-      className={`relative min-w-[190px] max-w-[240px] rounded-xl px-3.5 py-2.5 transition-all shadow-md ${
+      className={`relative min-w-[200px] max-w-[250px] rounded-xl px-3.5 py-3 transition-all shadow-xl ${
         style.bg
       } ${style.border} border ${
-        selected ? "ring-2 ring-white shadow-xl scale-105" : "hover:border-gray-400"
+        selected ? "ring-2 ring-white scale-105" : "hover:border-white/50"
       }`}
     >
-      <Handle type="target" position={Position.Left} className="!bg-[#7E7972] !w-2 !h-2" />
+      <Handle type="target" position={Position.Left} className="!bg-[#52525B] !w-2 !h-2" />
       
       <div className="flex items-center gap-2 mb-1.5">
         <Icon className={`w-3.5 h-3.5 ${style.text}`} />
@@ -69,23 +69,23 @@ function CustomGraphNode({ data, selected }: NodeProps) {
           {nodeType}
         </span>
         {Boolean(data.status) && (
-          <span className="ml-auto text-[9px] font-mono px-1 py-0.2 rounded bg-black/40 text-gray-400">
+          <span className="ml-auto text-[9px] font-mono px-1 py-0.5 rounded bg-black/60 text-[#A1A1AA] border border-[#27272F]">
             {String(data.status)}
           </span>
         )}
       </div>
 
-      <div className="text-xs font-medium text-gray-100 truncate" title={String(data.label || "")}>
+      <div className="text-xs font-semibold text-white truncate" title={String(data.label || "")}>
         {String(data.label || "")}
       </div>
 
       {Boolean(data.subtitle) && (
-        <div className="text-[10px] text-gray-400 truncate mt-0.5 font-mono">
+        <div className="text-[10px] text-[#A1A1AA] truncate mt-0.5 font-mono">
           {String(data.subtitle)}
         </div>
       )}
 
-      <Handle type="source" position={Position.Right} className="!bg-[#7E7972] !w-2 !h-2" />
+      <Handle type="source" position={Position.Right} className="!bg-[#52525B] !w-2 !h-2" />
     </div>
   );
 }
@@ -133,11 +133,11 @@ export default function GraphCanvas() {
   }, [nodes, filterType]);
 
   return (
-    <div className="relative w-full h-[650px] lg:h-[760px] rounded-xl border border-[#23252E] bg-[#0E0F13] overflow-hidden flex flex-col">
+    <div className="relative w-full h-[650px] lg:h-[760px] rounded-2xl border border-[#27272F] bg-[#000000] overflow-hidden flex flex-col shadow-2xl">
       {/* Control Toolbar */}
-      <div className="p-3 bg-[#13141A] border-b border-[#23252E] flex flex-wrap items-center justify-between gap-3 z-10">
+      <div className="p-3 bg-[#09090B] border-b border-[#27272F] flex flex-wrap items-center justify-between gap-3 z-10">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">
+          <span className="text-xs font-mono text-[#A1A1AA] uppercase tracking-wider">
             Filter View:
           </span>
           {["ALL", "Handoff", "APIContract", "Decision", "Module", "Conflict"].map((type) => (
@@ -146,8 +146,8 @@ export default function GraphCanvas() {
               onClick={() => setFilterType(type)}
               className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                 filterType === type
-                  ? "bg-[#272A35] text-white border border-[#3E4252]"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-[#1A1C23]"
+                  ? "bg-[#15151B] text-white border border-[#3F3F46]"
+                  : "text-[#A1A1AA] hover:text-white hover:bg-[#111116]"
               }`}
             >
               {type}
@@ -158,7 +158,7 @@ export default function GraphCanvas() {
         <div className="flex items-center gap-2">
           <button
             onClick={loadGraph}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1B1D25] hover:bg-[#232630] border border-[#2B2E3A] text-xs text-gray-300 font-mono transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#000000] hover:bg-[#15151B] border border-[#27272F] text-xs text-[#A1A1AA] hover:text-white font-mono transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
             <span>Reload Graph</span>
@@ -167,7 +167,7 @@ export default function GraphCanvas() {
       </div>
 
       {/* Main Canvas & Inspection Drawer */}
-      <div className="relative flex-1 w-full h-full">
+      <div className="relative flex-1 w-full h-full bg-[#000000]">
         <ReactFlow
           nodes={filteredNodes}
           edges={edges}
@@ -178,7 +178,7 @@ export default function GraphCanvas() {
           fitView
           fitViewOptions={{ padding: 0.2 }}
         >
-          <Background color="#1E2028" gap={20} size={1} />
+          <Background color="#181820" gap={24} size={1} />
           <Controls />
           <MiniMap
             nodeColor={(node: any) => {
@@ -195,18 +195,18 @@ export default function GraphCanvas() {
                   return "#3B82F6";
               }
             }}
-            maskColor="rgba(14, 15, 19, 0.7)"
-            style={{ background: "#13141A", borderRadius: 8, border: "1px solid #23252E" }}
+            maskColor="rgba(0, 0, 0, 0.85)"
+            style={{ background: "#09090B", borderRadius: 8, border: "1px solid #27272F" }}
           />
         </ReactFlow>
 
         {/* Node Inspection Drawer */}
         {selectedNode && (
-          <div className="absolute top-4 right-4 w-80 md:w-96 max-h-[90%] bg-[#14151B]/95 backdrop-blur-md border border-[#2B2E38] rounded-xl p-4 shadow-2xl z-20 overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-[#23252E]">
+          <div className="absolute top-4 right-4 w-80 md:w-96 max-h-[90%] bg-[#09090B]/95 backdrop-blur-md border border-[#27272F] rounded-xl p-4 shadow-2xl z-20 overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#27272F]">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400">
-                  Node Inspector
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#A1A1AA]">
+                  Node Properties
                 </span>
                 <h4 className="text-sm font-semibold text-white">
                   {selectedNode.data.label}
@@ -214,26 +214,26 @@ export default function GraphCanvas() {
               </div>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded bg-[#1D1F27]"
+                className="text-[#A1A1AA] hover:text-white text-xs px-2 py-1 rounded bg-[#15151B]"
               >
                 Close
               </button>
             </div>
 
             <div className="mt-3 space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-[#1E2028]">
-                <span className="text-gray-400">Node Type</span>
-                <span className="font-mono text-gray-200">{selectedNode.data.type}</span>
+              <div className="flex justify-between py-1 border-b border-[#1C1C24]">
+                <span className="text-[#A1A1AA]">Node Type</span>
+                <span className="font-mono text-white">{selectedNode.data.type}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[#1E2028]">
-                <span className="text-gray-400">Node ID</span>
-                <span className="font-mono text-gray-400 text-[11px] truncate max-w-[180px]">{selectedNode.id}</span>
+              <div className="flex justify-between py-1 border-b border-[#1C1C24]">
+                <span className="text-[#A1A1AA]">Node ID</span>
+                <span className="font-mono text-[#71717A] text-[11px] truncate max-w-[180px]">{selectedNode.id}</span>
               </div>
 
               {selectedNode.data.properties && (
                 <div className="pt-2">
-                  <span className="text-gray-400 block mb-1 font-mono text-[11px]">Raw Graph Properties:</span>
-                  <pre className="p-2.5 rounded bg-[#0A0B0E] border border-[#1E2026] font-mono text-[10px] text-gray-300 whitespace-pre-wrap overflow-x-auto max-h-60">
+                  <span className="text-[#A1A1AA] block mb-1 font-mono text-[11px]">Raw Graph Properties:</span>
+                  <pre className="p-2.5 rounded bg-[#000000] border border-[#27272F] font-mono text-[10px] text-gray-300 whitespace-pre-wrap overflow-x-auto max-h-60">
                     {JSON.stringify(selectedNode.data.properties, null, 2)}
                   </pre>
                 </div>

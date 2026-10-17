@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import AppShell from "@/components/AppShell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,12 +27,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark h-full">
-      <body className={`${geistSans.variable} ${geistMono.variable} bg-[#0B0C0E] text-[#EDEDED] min-h-screen flex antialiased`}>
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto min-h-screen flex flex-col bg-[#0B0C0E]">
-          {children}
-        </main>
+    <html lang="en" className="dark h-full bg-[#000000]">
+      <body className={`${geistSans.variable} ${geistMono.variable} bg-[#000000] text-[#F5F5F5] min-h-screen antialiased selection:bg-[#27272F] selection:text-white`}>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

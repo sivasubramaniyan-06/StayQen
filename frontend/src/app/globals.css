@@ -2,55 +2,57 @@
 @import "@xyflow/react/dist/style.css";
 
 :root {
-  --background: #0B0C0E;
-  --foreground: #EDEDED;
-  --card: #141519;
-  --card-border: #24262E;
-  --accent-titanium: #DCD8D3;
-  --accent-warm: #B5AFA7;
-  --accent-muted: #7E7972;
+  --background: #000000;
+  --foreground: #F5F5F5;
+  --surface-primary: #09090B;
+  --surface-secondary: #111116;
+  --card: #15151B;
+  --border-subtle: #27272F;
+  --text-primary: #F5F5F5;
+  --text-muted: #A1A1AA;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #000000;
+  color: #F5F5F5;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
 }
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0E0F12;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #282B33;
+  background: #27272F;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3B3F4A;
+  background: #3F3F46;
 }
 
-/* React Flow styling custom overrides for dark titanium theme */
+/* React Flow styling custom overrides for pure black theme */
 .react-flow__renderer {
-  background-color: #0d0e12 !important;
+  background-color: #000000 !important;
 }
 .react-flow__controls {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
-  background: #141519 !important;
-  border: 1px solid #24262E !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8) !important;
+  background: #09090B !important;
+  border: 1px solid #27272F !important;
   border-radius: 8px !important;
 }
 .react-flow__controls-button {
-  background: #141519 !important;
-  border-bottom: 1px solid #24262E !important;
-  fill: #B5AFA7 !important;
+  background: #09090B !important;
+  border-bottom: 1px solid #27272F !important;
+  fill: #A1A1AA !important;
 }
 .react-flow__controls-button:hover {
-  background: #1F2128 !important;
+  background: #15151B !important;
+  fill: #F5F5F5 !important;
 }
 .react-flow__attribution {
   display: none !important;

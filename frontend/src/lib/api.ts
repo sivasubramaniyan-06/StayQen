@@ -157,6 +157,18 @@ export const api = {
     return res.json();
   },
 
+  async getContractsCatalog(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/api/contracts`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch contracts catalog");
+    return res.json();
+  },
+
+  async getModulesCatalog(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/api/modules`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch modules catalog");
+    return res.json();
+  },
+
   async resetAndSeedDemo() {
     const res = await fetch(`${API_BASE}/api/demo/seed`, {
       method: "POST",

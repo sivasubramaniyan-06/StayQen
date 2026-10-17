@@ -46,7 +46,16 @@ class ConflictDetectionAgent:
                     )
                     
                     if is_conflict:
-                        conflict_id = f"conf_{uuid.uuid4().hex[:8]}"
+                        # Deterministic canonical ID to prevent duplicate conflict entries for same contract
+                        clean_ep = endpoint.strip("/").replace("/", "_")
+                        conflict_id = f"conf_{method.lower()}_{clean_ep}"
+                        
+                        # Check if conflict already exists in graph
+                        existing_all = graph_service.get_all_conflicts()
+                        already_open = any(c.get("id") == conflict_id and c.get("status") == "open" for c in existing_all)
+                        if already_open:
+                            continue
+
                         affected = list(set(
                             new_c.get("affected_modules", []) + 
                             new_handoff.get("affected_modules", []) + 
