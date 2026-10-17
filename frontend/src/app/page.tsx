@@ -65,12 +65,12 @@ export default function DashboardPage() {
     <div className="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8">
       {/* Top Hero Banner with Official STAYQEN Branding */}
       <div className="relative rounded-2xl bg-gradient-to-r from-[#15161C] via-[#181A22] to-[#121318] border border-[#272935] p-6 sm:p-8 shadow-xl overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-15 pointer-events-none hidden md:block">
+        <div className="absolute right-0 top-0 bottom-0 w-2/5 opacity-25 pointer-events-none hidden md:block">
           <Image
             src="/stayqen-logo.png"
             alt="STAYQEN Watermark"
             fill
-            className="object-contain object-right"
+            className="object-contain object-right drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
           />
         </div>
 

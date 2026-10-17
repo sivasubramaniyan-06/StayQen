@@ -78,7 +78,7 @@ export default function Sidebar() {
       <div>
         <div className="p-5 border-b border-[#22242B]">
           <Link href="/" className="block group">
-            <div className="bg-[#18191E] border border-[#282B33] rounded-xl p-2.5 shadow-sm group-hover:border-[#3E424D] transition-all">
+            <div className="bg-[#16171D] border border-[#24262E] rounded-xl p-2.5 shadow-sm group-hover:border-[#383B46] transition-all">
               <div className="relative w-full h-11 flex items-center justify-center">
                 <Image
                   src="/stayqen-logo.png"
@@ -86,7 +86,7 @@ export default function Sidebar() {
                   fill
                   sizes="260px"
                   priority
-                  className="object-contain"
+                  className="object-contain drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]"
                 />
               </div>
             </div>
