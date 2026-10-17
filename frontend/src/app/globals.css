@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+:root {
+  --background: #0B0C0E;
+  --foreground: #EDEDED;
+  --card: #141519;
+  --card-border: #24262E;
+  --accent-titanium: #DCD8D3;
+  --accent-warm: #B5AFA7;
+  --accent-muted: #7E7972;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0E0F12;
+}
+::-webkit-scrollbar-thumb {
+  background: #282B33;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3B3F4A;
+}
+
+/* React Flow styling custom overrides for dark titanium theme */
+.react-flow__renderer {
+  background-color: #0d0e12 !important;
+}
+.react-flow__controls {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  background: #141519 !important;
+  border: 1px solid #24262E !important;
+  border-radius: 8px !important;
+}
+.react-flow__controls-button {
+  background: #141519 !important;
+  border-bottom: 1px solid #24262E !important;
+  fill: #B5AFA7 !important;
+}
+.react-flow__controls-button:hover {
+  background: #1F2128 !important;
+}
+.react-flow__attribution {
+  display: none !important;
+}
