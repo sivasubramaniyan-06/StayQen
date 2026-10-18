@@ -54,6 +54,7 @@ export interface ConflictReportItem {
   severity: string;
   confidence: number;
   status: string;
+  detection_method?: string;
   summary: string;
   existing_item_summary: string;
   conflicting_item_summary: string;

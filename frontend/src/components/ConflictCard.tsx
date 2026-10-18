@@ -79,6 +79,13 @@ export default function ConflictCard({ conflict, onResolved }: ConflictCardProps
               <span className="text-xs font-mono text-[#71717A]">
                 Confidence: {(conflict.confidence * 100).toFixed(0)}%
               </span>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
+                conflict.detection_method === "llm"
+                  ? "bg-purple-950/40 text-purple-300 border-purple-800/40"
+                  : "bg-blue-950/40 text-blue-300 border-blue-800/40"
+              }`}>
+                {conflict.detection_method === "llm" ? "⚡ LLM Reasoned" : "📐 Rule Checked"}
+              </span>
               <span className="text-xs font-mono text-[#71717A]">
                 ID: {conflict.id}
               </span>
