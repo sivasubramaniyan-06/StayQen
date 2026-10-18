@@ -80,6 +80,7 @@ class ConflictReportItem(BaseModel):
     severity: str = "high"  # high, medium, low
     confidence: float = 0.95  # 0.0 to 1.0
     status: str = "open"  # open, resolved, ignored
+    detection_method: str = "rules"  # "rules", "llm"
     summary: str
     existing_item_summary: str
     conflicting_item_summary: str

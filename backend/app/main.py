@@ -50,12 +50,15 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health_check():
+    gemini_ready = conflict_agent.gemini_available and (conflict_agent.client is not None)
     return {
         "status": "healthy",
         "service": "STAYQEN Backend API",
         "falkordb_connected": graph_service.connected,
         "falkordb_graph": settings.FALKORDB_GRAPH,
-        "gemini_configured": conflict_agent.gemini_available,
+        "gemini_configured": gemini_ready,
+        "llm_reasoning_available": gemini_ready,
+        "llm_status": "active" if gemini_ready else "unavailable (deterministic rules fallback)",
         "environment": settings.ENVIRONMENT
     }
 
