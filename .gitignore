@@ -1,19 +1,57 @@
-# Dependencies
+# ── Dependencies ──────────────────────────────────────────
 node_modules/
 backend/venv/
 .venv/
 
-# Next.js
+# ── Next.js ───────────────────────────────────────────────
 frontend/.next/
 frontend/out/
+frontend/build/
+# root-level .next (stray build artifact)
+.next/
 
-# Python
+# ── Production builds ─────────────────────────────────────
+/build
+/dist
+
+# ── Python ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+*.egg
 
-# Environment
+# ── TypeScript ────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Logs ──────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── Environment / Secrets ─────────────────────────────────
 .env
-.env.local
+.env.*
+!.env.example
+!.env.template
+
+# ── OS & Editor ───────────────────────────────────────────
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Misc ──────────────────────────────────────────────────
+.vercel
+*.pem
+/coverage

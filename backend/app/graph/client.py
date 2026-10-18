@@ -31,9 +31,60 @@ class FalkorGraphService:
             self.graph.query("RETURN 1")
             self.connected = True
             logger.info(f"Connected to FalkorDB at {settings.FALKORDB_HOST}:{settings.FALKORDB_PORT}, graph: {settings.FALKORDB_GRAPH}")
+            if self.get_node_count() > 0:
+                self.load_from_falkordb()
         except Exception as e:
             self.connected = False
             logger.warning(f"Could not connect to FalkorDB ({e}). Using persistent in-memory graph fallback.")
+
+    def get_node_count(self) -> int:
+        if self.connected and self.graph:
+            try:
+                res = self.graph.query("MATCH (n) RETURN count(n)")
+                if res and res.result_set:
+                    return res.result_set[0][0]
+            except Exception as e:
+                logger.error(f"FalkorDB get_node_count failed: {e}")
+        return len(self.fallback_nodes)
+
+    def load_from_falkordb(self):
+        """Hydrate in-memory representation from FalkorDB graph."""
+        if not (self.connected and self.graph):
+            return
+        try:
+            self.fallback_nodes.clear()
+            self.fallback_edges.clear()
+
+            # 1. Fetch all nodes
+            res_nodes = self.graph.query("MATCH (n) RETURN labels(n), n")
+            if res_nodes and res_nodes.result_set:
+                for row in res_nodes.result_set:
+                    labels, node_obj = row
+                    label = labels[0] if labels else "Unknown"
+                    props = node_obj.properties if hasattr(node_obj, "properties") else dict(node_obj)
+                    nid = props.get("id")
+                    if nid:
+                        self.fallback_nodes[nid] = {"label": label, "props": props}
+
+            # 2. Fetch all edges
+            res_edges = self.graph.query("MATCH (a)-[r]->(b) RETURN a.id, type(r), r, b.id")
+            if res_edges and res_edges.result_set:
+                for row in res_edges.result_set:
+                    src_id, rel_type, rel_obj, tgt_id = row
+                    if not src_id or not tgt_id:
+                        continue
+                    edge_dict = {
+                        "source": src_id,
+                        "target": tgt_id,
+                        "type": rel_type,
+                        "label": "CONTRADICTS" if rel_type == "CONTRADICTS" else rel_type
+                    }
+                    if not any(e["source"] == src_id and e["target"] == tgt_id and e["type"] == rel_type for e in self.fallback_edges):
+                        self.fallback_edges.append(edge_dict)
+
+            logger.info(f"Loaded {len(self.fallback_nodes)} nodes and {len(self.fallback_edges)} edges from FalkorDB.")
+        except Exception as e:
+            logger.error(f"Failed to load from FalkorDB: {e}")
 
     def query(self, cypher: str, params: Optional[Dict[str, Any]] = None):
         """Execute a controlled Cypher query with parameters."""
@@ -172,6 +223,28 @@ class FalkorGraphService:
                         "MATCH (h:Handoff {id: $h_id}), (m:Module {id: $m_id}) MERGE (h)-[:AFFECTS]->(m)",
                         {"h_id": handoff_id, "m_id": mod_id}
                     )
+                # Record Decisions
+                for dec in handoff_data.get("technical_decisions", []):
+                    dec_id = dec.get("id") or str(uuid.uuid4())
+                    self.graph.query(
+                        "MATCH (h:Handoff {id: $h_id}) "
+                        "CREATE (d:Decision {id: $id, title: $title, description: $description, "
+                        "status: $status, handoff_id: $h_id}) "
+                        "MERGE (h)-[:RECORDED]->(d)",
+                        {
+                            "h_id": handoff_id,
+                            "id": dec_id,
+                            "title": dec.get("title", ""),
+                            "description": dec.get("description", ""),
+                            "status": dec.get("status", "active")
+                        }
+                    )
+                    for mod in dec.get("affected_modules", []):
+                        mod_id = f"mod_{mod.lower().replace('/', '_').replace('.', '_')}"
+                        self.graph.query(
+                            "MATCH (d:Decision {id: $d_id}), (m:Module {id: $m_id}) MERGE (d)-[:AFFECTS]->(m)",
+                            {"d_id": dec_id, "m_id": mod_id}
+                        )
                 # Record API contracts
                 for contract in handoff_data.get("api_contracts", []):
                     c_id = contract.get("id") or str(uuid.uuid4())
@@ -191,6 +264,12 @@ class FalkorGraphService:
                             "auth_required": contract.get("auth_required", True)
                         }
                     )
+                    for mod in contract.get("affected_modules", []):
+                        mod_id = f"mod_{mod.lower().replace('/', '_').replace('.', '_')}"
+                        self.graph.query(
+                            "MATCH (c:APIContract {id: $c_id}), (m:Module {id: $m_id}) MERGE (c)-[:AFFECTS]->(m)",
+                            {"c_id": c_id, "m_id": mod_id}
+                        )
             except Exception as e:
                 logger.error(f"FalkorDB Cypher execution error in record_handoff: {e}")
 
@@ -315,6 +394,12 @@ class FalkorGraphService:
             if self.connected and self.graph:
                 try:
                     self.graph.query(
+                        "MERGE (c:Conflict {id: $id}) "
+                        "ON CREATE SET c.title = $title, c.severity = $severity, c.summary = $summary, c.status = $status, c.data = $data "
+                        "ON MATCH SET c.title = $title, c.severity = $severity, c.summary = $summary, c.status = $status, c.data = $data",
+                        {"id": c_id, "title": props["title"], "severity": props["severity"], "summary": props["summary"], "status": props["status"], "data": props["data"]}
+                    )
+                    self.graph.query(
                         "MATCH (a), (b) WHERE a.id = $source_id AND b.id = $target_id "
                         "MERGE (a)-[r:CONTRADICTS {severity: $severity, title: $title}]->(b)",
                         {"source_id": source_id, "target_id": target_id, "severity": conflict_data["severity"], "title": conflict_data["title"]}
@@ -419,20 +504,37 @@ class FalkorGraphService:
         conflicts = []
         for nid, node in self.fallback_nodes.items():
             if node["label"] == "Conflict":
-                raw = node["props"]["data"]
-                data = json.loads(raw) if isinstance(raw, str) else raw
+                raw = node["props"].get("data")
+                if raw:
+                    data = json.loads(raw) if isinstance(raw, str) else dict(raw)
+                else:
+                    data = dict(node["props"])
                 data["status"] = node["props"].get("status", "open")
                 conflicts.append(data)
         return conflicts
 
     def resolve_conflict(self, conflict_id: str, resolution: Dict[str, Any]) -> bool:
+        if conflict_id not in self.fallback_nodes and self.connected and self.graph:
+            self.load_from_falkordb()
+
         if conflict_id in self.fallback_nodes:
             self.fallback_nodes[conflict_id]["props"]["status"] = "resolved"
-            raw = self.fallback_nodes[conflict_id]["props"]["data"]
-            data = json.loads(raw) if isinstance(raw, str) else raw
+            raw = self.fallback_nodes[conflict_id]["props"].get("data")
+            if raw:
+                data = json.loads(raw) if isinstance(raw, str) else dict(raw)
+            else:
+                data = dict(self.fallback_nodes[conflict_id]["props"])
             data["status"] = "resolved"
             data["resolution"] = resolution
             self.fallback_nodes[conflict_id]["props"]["data"] = json.dumps(data)
+            if self.connected and self.graph:
+                try:
+                    self.graph.query(
+                        "MATCH (c:Conflict {id: $id}) SET c.status = 'resolved', c.data = $data",
+                        {"id": conflict_id, "data": json.dumps(data)}
+                    )
+                except Exception as e:
+                    logger.error(f"FalkorDB resolve_conflict error: {e}")
             return True
         return False
 

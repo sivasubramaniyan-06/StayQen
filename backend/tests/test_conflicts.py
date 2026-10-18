@@ -141,3 +141,120 @@ def test_5_api_validation_and_error_handling():
     }
     response = client.post("/api/handoffs", json=invalid_payload)
     assert response.status_code == 422
+
+def test_6_conflict_resolution_both_actions():
+    """
+    Test Case 6: Test both conflict resolution actions ('keep_existing' and 'accept_new')
+    and verify the status and dashboard stats update correctly.
+    """
+    from app.seed_data import trigger_test_conflict
+    
+    # 1. Trigger test conflict
+    result = trigger_test_conflict()
+    assert result["conflicts_detected"] >= 1
+    conflict_id = result["conflicts"][0]["id"]
+    
+    # Verify open status
+    conflicts_res = client.get("/api/conflicts")
+    assert conflicts_res.status_code == 200
+    conflicts = conflicts_res.json()
+    target = next((c for c in conflicts if c["id"] == conflict_id), None)
+    assert target is not None
+    assert target["status"] == "open"
+    
+    # Action 1: Test "keep_existing"
+    res1 = client.post(f"/api/conflicts/{conflict_id}/resolve", json={
+        "chosen_resolution": "keep_existing",
+        "notes": "Team decided to keep RFC 6749 access_token standard"
+    })
+    assert res1.status_code == 200
+    assert res1.json()["status"] == "resolved"
+    
+    # Verify status in conflicts list
+    conflicts_res = client.get("/api/conflicts")
+    target = next((c for c in conflicts_res.json() if c["id"] == conflict_id), None)
+    assert target["status"] == "resolved"
+    assert target["resolution"]["chosen_resolution"] == "keep_existing"
+    
+    # Action 2: Test "accept_new" on a new conflict
+    # Reset conflict status to test accept_new
+    res2 = client.post(f"/api/conflicts/{conflict_id}/resolve", json={
+        "chosen_resolution": "accept_new",
+        "notes": "Migrate all clients to new compact token contract"
+    })
+    assert res2.status_code == 200
+    assert res2.json()["status"] == "resolved"
+    
+    conflicts_res = client.get("/api/conflicts")
+    target = next((c for c in conflicts_res.json() if c["id"] == conflict_id), None)
+    assert target["status"] == "resolved"
+    assert target["resolution"]["chosen_resolution"] == "accept_new"
+    
+    # Verify open_conflicts in stats is 0
+    stats = client.get("/api/dashboard/stats").json()
+    assert stats["open_conflicts"] == 0
+
+def test_7_persistence_after_backend_restart():
+    """
+    Test Case 7: FalkorDB persistence across backend restart.
+    Verifies that handoffs, contracts, and conflicts persist after memory re-hydration.
+    """
+    from app.seed_data import trigger_test_conflict
+    from app.graph.client import FalkorGraphService
+    
+    # 1. Trigger conflict and record a clean handoff
+    trigger_test_conflict()
+    clean_payload = {
+        "title": "Metrics Exporter Service",
+        "author_name": "Devin AI",
+        "source_tool": "Cursor",
+        "completed_work": "Exposed Prometheus /metrics endpoint for telemetry.",
+        "affected_modules": ["metrics_service"],
+        "api_contracts": [
+            {
+                "endpoint": "/metrics",
+                "method": "GET",
+                "description": "Scrape Prometheus metrics",
+                "response_schema": {"metrics": "string"},
+                "affected_modules": ["metrics_service"]
+            }
+        ]
+    }
+    handoff_res = client.post("/api/handoffs", json=clean_payload)
+    assert handoff_res.status_code == 200
+    new_handoff_id = handoff_res.json()["handoff_id"]
+    
+    # Resolve the conflict
+    conflict_id = "conf_post_api_auth_login"
+    client.post(f"/api/conflicts/{conflict_id}/resolve", json={
+        "chosen_resolution": "accept_new",
+        "notes": "Persist resolved decision"
+    })
+    
+    # Count before restart
+    pre_handoffs = len(client.get("/api/handoffs").json())
+    pre_contracts = len(client.get("/api/contracts").json())
+    pre_conflicts = client.get("/api/conflicts").json()
+    assert any(c["id"] == conflict_id and c["status"] == "resolved" for c in pre_conflicts)
+    
+    # 2. Simulate Backend Restart:
+    # Instantiate a fresh FalkorGraphService connected to FalkorDB
+    fresh_service = FalkorGraphService()
+    assert fresh_service.connected is True
+    
+    # Verify the fresh service hydrated all data from FalkorDB
+    assert fresh_service.get_node_count() > 0
+    post_handoffs = fresh_service.get_all_handoffs()
+    post_contracts = fresh_service.get_contracts_catalog()
+    post_conflicts = fresh_service.get_all_conflicts()
+    
+    assert len(post_handoffs) == pre_handoffs
+    assert any(h["id"] == new_handoff_id for h in post_handoffs)
+    assert len(post_contracts) == pre_contracts
+    assert any(c["endpoint"] == "/metrics" for c in post_contracts)
+    
+    resolved_conflict = next((c for c in post_conflicts if c["id"] == conflict_id), None)
+    assert resolved_conflict is not None
+    assert resolved_conflict["status"] == "resolved"
+    assert resolved_conflict["resolution"]["chosen_resolution"] == "accept_new"
+

@@ -38,6 +38,9 @@ class ConflictDetectionAgent:
             new_c_id = new_c.get("id") or str(uuid.uuid4())
 
             for ex_c in existing_contracts:
+                # Do not compare contract against itself
+                if ex_c.get("handoff_id") == handoff_id or (new_c.get("id") and ex_c.get("id") == new_c.get("id")):
+                    continue
                 # Compare same endpoint and HTTP method
                 if ex_c.get("endpoint") == endpoint and ex_c.get("method") == method:
                     ex_res_schema = ex_c.get("response_schema", {})

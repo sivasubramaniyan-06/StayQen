@@ -88,6 +88,7 @@ class ConflictReportItem(BaseModel):
     affected_modules: List[str]
     recommendation: str
     detected_at: str
+    resolution: Optional[Dict[str, Any]] = None
 
 class ConflictResolution(BaseModel):
     chosen_resolution: str  # "keep_existing", "accept_new", "custom"

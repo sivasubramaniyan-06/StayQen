@@ -19,7 +19,17 @@ from contextlib import asynccontextmanager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing STAYQEN Knowledge Graph and Baseline Memory...")
-    seed_baseline_data()
+    if graph_service.connected:
+        node_count = graph_service.get_node_count()
+        if node_count == 0:
+            logger.info("FalkorDB is empty. Seeding baseline data...")
+            seed_baseline_data()
+        else:
+            logger.info(f"FalkorDB contains {node_count} nodes. Preserving existing project memory across restart.")
+            graph_service.load_from_falkordb()
+    else:
+        if not graph_service.fallback_nodes:
+            seed_baseline_data()
     yield
 
 app = FastAPI(
