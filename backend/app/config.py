@@ -15,8 +15,7 @@ class Settings(BaseSettings):
     
     # Gemini AI API Key
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash"
-    
+    GEMINI_MODEL: str = "gemini-3.8-flash"
     # CORS
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
